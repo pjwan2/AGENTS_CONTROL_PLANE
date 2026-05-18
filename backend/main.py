@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from backend.api.agents import router as agents_router
 from backend.api.routes import router
 from backend.api.runs import router as runs_router
 from backend.db.database import engine
@@ -38,3 +39,4 @@ app = FastAPI(
 # Include routes
 app.include_router(router)
 app.include_router(runs_router)
+app.include_router(agents_router)

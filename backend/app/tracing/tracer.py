@@ -139,6 +139,10 @@ class RunContext:
         self.trace_id: str = run.trace_id
         self.run_id: int = run.id
 
+    @property
+    def duration_ms(self) -> Optional[int]:
+        return self._run.duration_ms
+
     def __enter__(self) -> RunContext:
         self._token = _active_run.set(self)
         return self
