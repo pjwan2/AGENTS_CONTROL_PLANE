@@ -44,6 +44,20 @@ services:
     networks:
       - agentops_network
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agentops_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - agentops_network
+
 networks:
   agentops_network:
     driver: bridge
