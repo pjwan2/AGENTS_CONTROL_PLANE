@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentops_postgres
+    environment:
+      POSTGRES_USER: agentops
+      POSTGRES_PASSWORD: agentops_dev_password
+      POSTGRES_DB: agentops_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentops -d agentops_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentops_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentops_backend
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: agentops
+      DB_PASSWORD: agentops_dev_password
+      DB_NAME: agentops_db
+      APP_ENV: development
+      APP_DEBUG: "true"
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - agentops_network
+
+networks:
+  agentops_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
